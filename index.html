@@ -1,0 +1,636 @@
+<!doctype html><html><head><meta charset=utf8><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+<meta name="theme-color" content="#0d1226">
+<meta name="apple-mobile-web-app-title" content="星屑の王冠">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+
+</head><body>
+<title>星屑の王冠</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+/* Layout: one-column phone card game. Night-sky indigo ground, star-gold accent; element colors carry meaning. */
+:root{
+  --bg:#0d1226; --bg2:#141b38; --panel:#1a2347; --panel2:#243063; --line:#34417a;
+  --fg:#e8ebf8; --muted:#a3acd2; --gold:#f2c35b; --gold2:#ffe1a0; --ink-on-gold:#2a1d00;
+  --danger:#ef6a6a; --good:#58c88a;
+  --el-fire:#e8643c; --el-water:#3d9be0; --el-wood:#4fb36a; --el-light:#f1d36b; --el-dark:#8a5cc6;
+  --f-display:'Shippori Mincho','Hiragino Mincho ProN','Yu Mincho',serif;
+  --f-body:'Zen Kaku Gothic New','Hiragino Kaku Gothic ProN','Yu Gothic',system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:500 14px/1.6 var(--f-body);padding-inline:16px;-webkit-tap-highlight-color:transparent}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:
+   radial-gradient(1.5px 1.5px at 12% 18%,#ffffff99 50%,transparent 51%),
+   radial-gradient(1px 1px at 78% 12%,#ffffff88 50%,transparent 51%),
+   radial-gradient(1.5px 1.5px at 64% 44%,#ffe1a0aa 50%,transparent 51%),
+   radial-gradient(1px 1px at 25% 70%,#ffffff77 50%,transparent 51%),
+   radial-gradient(1px 1px at 90% 82%,#ffffff88 50%,transparent 51%),
+   radial-gradient(1px 1px at 40% 30%,#ffffff66 50%,transparent 51%),
+   radial-gradient(130% 55% at 50% -10%,#2a3585aa,transparent 70%);}
+h1,h2,h3,p{margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+button:disabled{cursor:not-allowed}
+.muted{color:var(--muted)}
+
+.el-fire{--c:var(--el-fire)} .el-water{--c:var(--el-water)} .el-wood{--c:var(--el-wood)}
+.el-light{--c:var(--el-light)} .el-dark{--c:var(--el-dark)}
+
+/* header */
+.top{max-width:520px;margin:0 auto;padding-block:14px 8px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.top h1{font:800 22px/1.2 var(--f-display);letter-spacing:.08em;color:var(--gold2);display:flex;align-items:center;gap:8px}
+.top h1 svg{width:22px;height:22px;fill:var(--gold)}
+.wallet{display:flex;gap:8px}
+.wallet span{display:flex;align-items:center;gap:5px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-variant-numeric:tabular-nums;font-weight:700}
+.wallet svg{width:16px;height:16px}
+main{max-width:520px;margin:0 auto;padding-block:8px 100px}
+section{margin-bottom:22px}
+section>h2,.sh h2{font:800 17px/1.3 var(--f-display);letter-spacing:.05em;margin-bottom:10px}
+.sh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:10px}
+.sh h2{margin:0}
+.cost{font-weight:700;font-variant-numeric:tabular-nums;color:var(--gold2)}
+.cost.bad{color:var(--danger)}
+
+/* bottom nav */
+nav{position:fixed;left:0;right:0;bottom:0;z-index:10;background:var(--bg2);border-top:1px solid var(--line);padding:6px 16px calc(6px + env(safe-area-inset-bottom,0px))}
+.nav-in{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.nav-in button{background:none;border:0;border-radius:10px;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--muted);font-size:12px;font-weight:700}
+.nav-in svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav-in button.on{color:var(--gold2);background:var(--panel)}
+
+/* buttons */
+.btn{border:1px solid var(--line);background:var(--panel2);border-radius:10px;padding:11px 14px;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;min-height:46px;text-align:center}
+.btn small{font-size:11px;font-weight:500;color:var(--muted)}
+.btn.pri{background:linear-gradient(180deg,var(--gold2),var(--gold));color:var(--ink-on-gold);border-color:var(--gold)}
+.btn.pri small{color:#5a4310}
+.btn.ghost{background:transparent}
+.btn:disabled{opacity:.45}
+.btns{display:flex;gap:8px;margin-top:14px}
+.btns>*{flex:1}
+.btns.col{flex-direction:column}
+.link{background:none;border:0;color:var(--muted);text-decoration:underline;padding:6px 0;font-size:12px}
+
+/* quest tab */
+.prologue{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:14px;padding:16px}
+.prologue h2{font:800 18px/1.3 var(--f-display);color:var(--gold2);margin-bottom:6px;letter-spacing:.06em}
+.deckbar{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.deckbar .mini{display:flex;gap:6px;flex:1;min-width:0}
+.deckbar .mini i{width:34px;height:34px;border-radius:8px;background:color-mix(in srgb,var(--c) 55%,var(--bg));border:1.5px solid var(--c);display:grid;place-items:center;font:700 14px var(--f-display);font-style:normal}
+.deckbar .btn{min-height:38px;padding:6px 12px;flex:0 0 auto}
+.quests{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;display:grid;gap:8px}
+.q.locked{opacity:.5}
+.qh{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.qn{font:800 17px/1.3 var(--f-display);letter-spacing:.04em}
+.tag{font-size:11px;font-weight:700;border-radius:999px;padding:1px 8px;background:var(--danger);color:#2b0a0a}
+.tag.ok{background:var(--good);color:#06240f}
+.qd{color:var(--muted);font-size:13px}
+.qm{display:flex;gap:6px;flex-wrap:wrap}
+.qm .mon{width:34px;height:34px}
+.qf{display:flex;align-items:center;gap:12px;justify-content:space-between}
+.rw-line{display:flex;gap:12px;font-weight:700;font-variant-numeric:tabular-nums}
+.rw-line span{display:flex;align-items:center;gap:4px}
+.rw-line svg{width:15px;height:15px}
+.q .btn{min-height:40px;padding:6px 22px;flex:0 0 auto}
+
+/* cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:10px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.card{position:relative;display:flex;flex-direction:column;min-width:0;border-radius:10px;overflow:hidden;background:var(--panel);border:1.5px solid color-mix(in srgb,var(--c) 70%,var(--line));padding:0;text-align:left}
+button.card:hover{border-color:var(--gold)}
+.card .art{position:relative;display:block;aspect-ratio:1;background:radial-gradient(circle at 50% 38%,color-mix(in srgb,var(--c) 60%,var(--bg)),color-mix(in srgb,var(--c) 16%,var(--bg)) 78%);overflow:hidden}.portrait{position:absolute;inset:0;width:100%;height:100%;display:block}.card .art .portrait{object-fit:cover}.dart .art{aspect-ratio:3/4}.dart .portrait{object-fit:cover}
+.crest{position:absolute;inset:12%;width:76%;height:76%;color:color-mix(in srgb,var(--c) 35%,#fff)}
+.card .elg{position:absolute;top:5px;right:5px;width:20px;height:20px;border-radius:50%;background:var(--c);color:#fff;display:grid;place-items:center;font:800 11px var(--f-display);text-shadow:0 1px 1px #0008}
+.card .rr{position:absolute;top:5px;left:5px;font:800 10px/1 var(--f-body);padding:3px 5px;border-radius:5px;background:#0b1024cc;color:var(--muted);letter-spacing:.05em}
+.card .lv{position:absolute;left:5px;bottom:4px;font:700 10px/1 var(--f-body);background:#0b1024cc;padding:3px 5px;border-radius:5px;font-variant-numeric:tabular-nums}
+.card .badge{position:absolute;right:4px;bottom:4px;font:700 10px/1 var(--f-body);background:var(--gold);color:var(--ink-on-gold);padding:3px 5px;border-radius:5px}
+.card .nm{display:block;padding:5px 7px 0;font:800 13px/1.3 var(--f-display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .sub{display:block;padding:0 7px 6px;font-size:10px;line-height:1.35;color:var(--muted);font-variant-numeric:tabular-nums}
+.rar-R{border-color:#8fb1ff}
+.rar-R .rr{color:#bcd0ff}
+.rar-SR{border-color:var(--gold);box-shadow:0 0 14px #f2c35b44}
+.rar-SR .rr{background:var(--gold);color:var(--ink-on-gold)}
+.rar-SR .art::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,#ffffff40 50%,transparent 65%);transform:translateX(-120%);animation:sheen 4.5s ease-in-out infinite}
+@keyframes sheen{0%,55%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
+.slot{aspect-ratio:3/4;border:1.5px dashed var(--line);border-radius:10px;display:grid;place-items:center;color:var(--muted);font-size:12px}
+
+.legend{display:flex;flex-direction:column;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px}
+.chain{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.chip{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--c);color:#fff;font:800 13px var(--f-display);text-shadow:0 1px 1px #0008}
+.arrow{color:var(--muted)}
+
+/* gacha */
+.banner{position:relative;overflow:hidden;background:linear-gradient(160deg,#2c3a85,var(--panel) 70%);border:1px solid var(--line);border-radius:16px;padding:20px 16px;display:grid;gap:10px}
+.banner h2{font:800 22px/1.3 var(--f-display);color:var(--gold2);letter-spacing:.08em;margin:0}
+.banner .bigcrest{position:absolute;right:-30px;top:-30px;width:170px;height:170px;color:var(--gold);opacity:.16;animation:spin 60s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.banner>*{position:relative}
+.pulls{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+.banner .rates{font-variant-numeric:tabular-nums;font-weight:700}
+
+/* modal */
+#modal{position:fixed;inset:0;z-index:40;display:flex;align-items:flex-end;justify-content:center}
+.backdrop{position:absolute;inset:0;background:#05081acc}
+.sheet{position:relative;width:100%;max-width:520px;max-height:92%;overflow:auto;background:var(--bg2);border:1px solid var(--line);border-radius:18px 18px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px))}
+.sheet h2.res{font:800 22px/1.3 var(--f-display);text-align:center;letter-spacing:.08em;margin-bottom:12px}
+.sheet h2.res.win{color:var(--gold2)}
+.sheet h2.res.lose{color:var(--muted)}
+.dt{display:flex;gap:14px;align-items:flex-start}
+.dart{width:112px;flex:0 0 auto}
+.dinfo{min-width:0;display:grid;gap:2px}
+.dinfo .ep{color:var(--muted);font-size:12px}
+.dinfo h2{font:800 24px/1.2 var(--f-display);letter-spacing:.04em}
+.stats{margin-top:6px}
+.stats b{font-size:18px;font-variant-numeric:tabular-nums}
+.skill{margin-top:14px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:grid;gap:2px}
+.skill span{color:var(--muted);font-size:13px}
+.res-grid{grid-template-columns:repeat(auto-fill,minmax(88px,1fr))}
+.pop{animation:pop .45s both;animation-delay:calc(var(--i,0)*.07s)}
+@keyframes pop{from{opacity:0;transform:scale(.8) translateY(8px)}to{opacity:1;transform:none}}
+.rwlist{list-style:none;margin:0 0 12px;padding:0;display:grid;gap:6px}
+.rwlist li{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 12px;display:flex;justify-content:space-between;font-weight:700;font-variant-numeric:tabular-nums}
+.dropbox{display:flex;align-items:center;gap:12px;margin:12px 0}
+.dropbox .card{width:96px;flex:0 0 auto}
+
+#toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;background:var(--panel2);border:1px solid var(--gold);padding:8px 16px;border-radius:999px;font-size:13px;font-weight:700;max-width:90%;text-align:center}
+
+/* monsters */
+.mon{display:block;--c:#888}
+.mon .b{fill:var(--c);stroke:color-mix(in srgb,var(--c) 40%,#000);stroke-width:2.5;stroke-linejoin:round}
+.mon .e{fill:#fff3c9}
+
+/* battle */
+#battle{position:fixed;inset:0;z-index:20;background:radial-gradient(130% 70% at 50% 0%,#27327a,var(--bg) 72%);padding:env(safe-area-inset-top,0px) 12px calc(env(safe-area-inset-bottom,0px) + 12px)}
+.b-in{max-width:520px;height:100%;margin:0 auto;display:flex;flex-direction:column;gap:10px;padding-top:10px}
+.b-top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.b-top b{font:800 17px var(--f-display);letter-spacing:.05em;display:block}
+.b-top small{color:var(--muted);font-variant-numeric:tabular-nums}
+.b-ctl{display:flex;gap:6px}
+.b-ctl button{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;min-height:34px}
+.b-ctl button.on{background:var(--gold);color:var(--ink-on-gold);border-color:var(--gold)}
+.b-field{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:14px}
+#b-enemies{display:flex;justify-content:center;align-items:flex-end;gap:8px}
+.en{flex:1;max-width:120px;min-width:0;text-align:center;position:relative}
+.en.boss{max-width:200px}
+.en .mon{width:100%;aspect-ratio:1;filter:drop-shadow(0 6px 10px #0008)}
+.en .enm{font:700 11px/1.3 var(--f-body);margin-top:4px}
+.en.dead{opacity:.12;filter:grayscale(1)}
+.bar{height:6px;border-radius:3px;background:#0b1024;overflow:hidden;border:1px solid #ffffff22}
+.bar i{display:block;height:100%;background:var(--good);transition:width .25s}
+.en .bar i{background:var(--danger)}
+#b-log{min-height:28px;text-align:center;font:800 17px/1.4 var(--f-display);color:var(--gold2);letter-spacing:.06em}
+#b-party{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.pm{background:var(--panel);border:1.5px solid color-mix(in srgb,var(--c) 70%,var(--line));border-radius:10px;padding:5px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.pm .pa{position:relative;aspect-ratio:1;border-radius:6px;background:radial-gradient(circle at 50% 38%,color-mix(in srgb,var(--c) 60%,var(--bg)),color-mix(in srgb,var(--c) 16%,var(--bg)) 78%);overflow:hidden}.pm .pa .portrait{width:100%;height:100%;object-fit:cover}
+.pm .pn{font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pm .pv{font-size:10px;color:var(--muted);font-variant-numeric:tabular-nums;line-height:1.2}
+.pm.dead{filter:grayscale(1);opacity:.45}
+.sk{border:0;border-radius:6px;padding:5px 2px;font:700 11px/1.2 var(--f-body);background:var(--panel2);color:var(--muted);min-height:34px}
+.sk.ready{background:var(--gold);color:var(--ink-on-gold);animation:pulse 1s ease-in-out infinite}
+.sk.pend{background:var(--gold2);color:var(--ink-on-gold);animation:none}
+@keyframes pulse{50%{box-shadow:0 0 0 4px #f2c35b55}}
+.pm.act{animation:lunge .25s}
+.en.act{animation:lungeE .25s}
+.hit{animation:shake .25s}
+@keyframes lunge{50%{transform:translateY(-10px)}}
+@keyframes lungeE{50%{transform:translateY(12px)}}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+#fx{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.dmg{position:absolute;font:800 22px var(--f-display);color:#fff;text-shadow:0 2px 0 #000b;animation:rise .9s ease-out forwards;white-space:nowrap}
+.dmg.weak{color:var(--gold2);font-size:30px}
+.dmg.resist{color:var(--muted);font-size:17px}
+.dmg.heal{color:var(--good)}
+.dmg.ally{color:#ffb4b4}
+@keyframes rise{0%{opacity:0;transform:translate(-50%,8px) scale(.8)}15%{opacity:1;transform:translate(-50%,-4px) scale(1.1)}100%{opacity:0;transform:translate(-50%,-40px) scale(1)}}
+
+/* iPhone Safari compatibility */
+.card{border-color:var(--line)}
+.card .art{background:radial-gradient(circle at 50% 38%,var(--panel2),var(--bg) 78%)}
+.crest{color:var(--muted)}
+.deckbar .mini i{background:var(--panel2)}
+.pm{border-color:var(--line)}
+.pm .pa{background:radial-gradient(circle at 50% 38%,var(--panel2),var(--bg) 78%)}
+button,.btn{-webkit-appearance:none;appearance:none;touch-action:manipulation}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<header class="top">
+  <h1><svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="12,2 14.9,8.6 22,9.3 16.6,14 18.2,21 12,17.3 5.8,21 7.4,14 2,9.3 9.1,8.6"/></svg>星屑の王冠</h1>
+  <div class="wallet">
+    <span title="ゴールド"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#f2c35b"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#a97d1c" stroke-width="1.6"/></svg><b id="w-gold">0</b></span>
+    <span title="星のかけら"><svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="12,2 14.9,8.6 22,9.3 16.6,14 18.2,21 12,17.3 5.8,21 7.4,14 2,9.3 9.1,8.6" fill="#9fc0ff"/></svg><b id="w-shard">0</b></span>
+  </div>
+</header>
+<main id="view"></main>
+<nav><div class="nav-in">
+  <button data-a="tab" data-v="quest"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3v18M6 4h12l-3 4 3 4H6"/></svg>クエスト</button>
+  <button data-a="tab" data-v="deck"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="12" height="16" rx="2"/><path d="M19 7v11a3 3 0 0 1-3 3"/></svg>編成</button>
+  <button data-a="tab" data-v="gacha"><svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="12,3 14.6,9.2 21,9.8 16.2,14 17.7,20.5 12,17 6.3,20.5 7.8,14 3,9.8 9.4,9.2"/></svg>召喚</button>
+</div></nav>
+
+<div id="battle" hidden>
+  <div class="b-in">
+    <div class="b-top">
+      <div><b id="b-quest"></b><small id="b-wave"></small></div>
+      <div class="b-ctl">
+        <button id="b-auto" data-a="auto" type="button">オート OFF</button>
+        <button id="b-speed" data-a="speed" type="button">×1</button>
+        <button data-a="retreat" type="button">撤退</button>
+      </div>
+    </div>
+    <div class="b-field"><div id="b-enemies"></div><div id="b-log"></div></div>
+    <div id="b-party"></div>
+  </div>
+  <div id="fx"></div>
+</div>
+<div id="modal" hidden></div>
+<div id="toast" hidden></div>
+
+<script>
+(function(){
+'use strict';
+const $=(s,r=document)=>r.querySelector(s);
+
+/* ---------- data ---------- */
+const EL={'炎':'fire','水':'water','森':'wood','光':'light','闇':'dark'};
+const ADV={'炎':'森','森':'水','水':'炎'};
+const RM={N:1,R:2,SR:4}, MAXLV={N:10,R:15,SR:20}, RANK={N:0,R:1,SR:2};
+const CARDS={
+  rio:{n:'リオ',t:'見習い剣士',r:'N',el:'炎',atk:12,hp:60,cost:3,pts:5,sk:{n:'ひと太刀',type:'single',m:2.4,cd:3}},
+  selina:{n:'セリナ',t:'泉の巫女',r:'N',el:'水',atk:8,hp:70,cost:3,pts:6,sk:{n:'癒しの雫',type:'heal',pct:.3,cd:4}},
+  tio:{n:'ティオ',t:'森の弓使い',r:'N',el:'森',atk:11,hp:55,cost:3,pts:4,sk:{n:'三連射',type:'multi',hits:3,m:.9,cd:3}},
+  garett:{n:'ガレット',t:'灯火の騎士',r:'R',el:'炎',atk:20,hp:100,cost:5,pts:6,sk:{n:'烈火斬',type:'all',m:1.3,cd:4}},
+  mirei:{n:'ミレイ',t:'氷湖の魔女',r:'R',el:'水',atk:18,hp:90,cost:5,pts:7,sk:{n:'凍てつく波',type:'all',m:1.25,cd:4}},
+  verna:{n:'ヴェルナ',t:'風読みの狩人',r:'R',el:'森',atk:19,hp:85,cost:5,pts:5,sk:{n:'疾風の矢',type:'multi',hits:4,m:.85,cd:4}},
+  lume:{n:'ルーメ',t:'星詠みの司祭',r:'R',el:'光',atk:15,hp:110,cost:5,pts:8,sk:{n:'星の祝福',type:'heal',pct:.4,cd:5}},
+  noa:{n:'ノワ',t:'影渡りの暗殺者',r:'R',el:'闇',atk:24,hp:70,cost:5,pts:3,sk:{n:'影断ち',type:'single',m:3.4,cd:4}},
+  asteria:{n:'アステリア',t:'星屑の王女',r:'SR',el:'光',atk:38,hp:190,cost:8,pts:9,sk:{n:'星屑の王冠',type:'allheal',m:2,pct:.2,cd:5}},
+  valg:{n:'ヴァルグ',t:'竜骨の将',r:'SR',el:'炎',atk:42,hp:170,cost:8,pts:7,sk:{n:'竜骨砕き',type:'single',m:5,cd:5}},
+  neva:{n:'ネヴァ',t:'深淵の魔導師',r:'SR',el:'闇',atk:40,hp:160,cost:8,pts:8,sk:{n:'深淵の奔流',type:'all',m:1.9,cd:5}}
+};
+const IDS=Object.keys(CARDS);
+const EN={
+  slime:{n:'プルプルスライム',el:'水',atk:9,hp:55,sh:'blob'},
+  goblin:{n:'はぐれゴブリン',el:'森',atk:12,hp:80,sh:'horn'},
+  bat:{n:'月夜のコウモリ',el:'闇',atk:14,hp:70,sh:'bat'},
+  wolf:{n:'森狼',el:'森',atk:15,hp:85,sh:'wolf'},
+  wisp:{n:'迷い火',el:'炎',atk:18,hp:100,sh:'wisp'},
+  witch:{n:'沼の魔女',el:'水',atk:20,hp:160,sh:'hood'},
+  skel:{n:'骸骨兵',el:'闇',atk:22,hp:180,sh:'hood'},
+  captain:{n:'砦の隊長 ゾルド',el:'闇',atk:30,hp:420,sh:'horn',boss:1,aoe:3},
+  dragon:{n:'骨喰らいの竜',el:'炎',atk:45,hp:900,sh:'dragon',boss:1,aoe:3}
+};
+const QUESTS=[
+  {id:'q1',name:'森のはずれ',desc:'星屑が降った森の入口。弱い魔物がうろついている。',waves:[['slime','slime'],['goblin']],gold:80,first:20,rep:4,drop:{p:.3,ids:['rio','selina','tio']}},
+  {id:'q2',name:'古い石橋',desc:'谷をまたぐ石橋に、森の獣と夜の魔物が集まっている。',waves:[['goblin','bat'],['wolf','wolf']],gold:110,first:20,rep:4,drop:{p:.3,ids:['rio','selina','tio','garett','verna']}},
+  {id:'q3',name:'霧の湿地',desc:'迷い火が漂う湿地。沼の魔女が星屑を集めている。',waves:[['wisp','wisp'],['witch','slime','slime']],gold:150,first:20,rep:5,drop:{p:.3,ids:['garett','mirei','verna','lume','selina']}},
+  {id:'q4',name:'月影の砦',desc:'骸骨兵が守る古い砦。奥に隊長の気配がある。',waves:[['skel','skel'],['bat','bat','skel'],['captain']],gold:240,first:30,rep:6,boss:1,drop:{p:.35,ids:['mirei','lume','noa','verna','garett']}},
+  {id:'q5',name:'竜骨の渓谷',desc:'砕けた王冠の欠片を、巨大な竜が抱えている。',waves:[['skel','wisp','wisp'],['witch','skel'],['dragon']],gold:380,first:40,rep:8,boss:1,drop:{p:.4,ids:['noa','lume','mirei','asteria','valg','neva']}}
+];
+
+/* ---------- state ---------- */
+const SAVE_KEY='hoshikuzu-crown-v1';
+function fresh(){return {gold:500,shards:30,nu:5,cards:[{u:1,id:'rio',lv:1},{u:2,id:'selina',lv:1},{u:3,id:'tio',lv:1},{u:4,id:'garett',lv:1}],deck:[1,2,3,4],cleared:{},tab:'quest'};}
+function load(){try{const j=localStorage.getItem(SAVE_KEY);if(!j)return fresh();const s=JSON.parse(j);if(!s||!Array.isArray(s.cards)||!Array.isArray(s.deck))return fresh();return Object.assign(fresh(),s);}catch(e){return fresh();}}
+function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(S));}catch(e){}}
+let S=load();
+let B=null, sellArm=0, resetArm=false, lastQuest=null, toastTimer=0;
+
+const inst=u=>S.cards.find(c=>c.u===u);
+const mul=lv=>1+0.14*(lv-1);
+const cAtk=c=>Math.round(CARDS[c.id].atk*mul(c.lv));
+const cHp=c=>Math.round(CARDS[c.id].hp*mul(c.lv));
+const deckCost=()=>S.deck.reduce((s,u)=>s+CARDS[inst(u).id].cost,0);
+const costLimit=()=>Math.min(30,14+2*Object.keys(S.cleared).length);
+const enhCost=c=>Math.round(8*c.lv*RM[CARDS[c.id].r]);
+const sellVal=c=>{const r=CARDS[c.id].r;return r==='N'?10+c.lv*5:r==='R'?40+c.lv*10:150+c.lv*20;};
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function addCard(id){const c={u:S.nu++,id,lv:1};S.cards.push(c);return c;}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>{t.hidden=true;},1800);}
+
+/* ---------- drawing helpers ---------- */
+/* Character-style card portraits. Offline SVG artwork keeps the game self-contained;
+   each roster member has distinct hair, eyes, outfit, and elemental aura. */
+const PORTRAITS={
+  rio:['#e8bd68','#a7432e','#f3d2a1','#4d8de0','short'],
+  selina:['#8bc9e8','#5e9fd2','#f2d7c0','#56bce0','long'],
+  tio:['#6dbb83','#b77b48','#f2d0b0','#68a96b','short'],
+  garett:['#d99a54','#8e352a','#f1cba8','#e8643c','spiky'],
+  mirei:['#b9d7ee','#8b9fc9','#f4d9c8','#3d9be0','long'],
+  verna:['#a9d48b','#9a6b47','#f4d5b8','#4fb36a','long'],
+  lume:['#f0d77b','#d2a35e','#f6ddc8','#f1d36b','long'],
+  noa:['#292c4f','#4a263f','#eac5b2','#8a5cc6','long'],
+  asteria:['#f5d37a','#e2b65e','#f8dfc8','#f1d36b','long'],
+  valg:['#e7a45a','#8d3b2c','#eec5a4','#e8643c','spiky'],
+  neva:['#c4b3e8','#59486e','#efd1c5','#8a5cc6','long']
+};
+function portrait(d){
+  const [hair,cloth,skin,glow,style]=PORTRAITS[Object.keys(CARDS).find(id=>CARDS[id]===d)]||['#d7c0e8','#4c5f91','#f2d2bd','#9fc0ff','long'];
+  const bangs=style==='spiky'?'M17 42L11 18L31 30L36 9L49 28L66 8L69 30L89 17L82 47L70 39L60 33L48 39L36 32L25 43Z':style==='short'?'M18 46Q8 15 39 12Q75 4 84 34L79 53L69 38L59 31L46 38L31 30L23 48Z':'M17 43Q8 8 48 9Q88 9 83 46L91 89L73 73L70 42L59 31L47 38L31 29L25 47L23 83L8 91Z';
+  return `<svg class="portrait" viewBox="0 0 100 100" role="img" aria-label="${d.n}のキャラクターイラスト"><defs><linearGradient id="bg-${Object.keys(CARDS).find(id=>CARDS[id]===d)}" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${glow}"/><stop offset="1" stop-color="#101936"/></linearGradient><linearGradient id="hair-${Object.keys(CARDS).find(id=>CARDS[id]===d)}" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${hair}"/><stop offset="1" stop-color="#27213c"/></linearGradient></defs><rect width="100" height="100" fill="url(#bg-${Object.keys(CARDS).find(id=>CARDS[id]===d)})"/><circle cx="50" cy="38" r="34" fill="${glow}" opacity=".24"/><path d="M7 100Q10 70 30 67L70 67Q91 74 94 100Z" fill="${cloth}" stroke="#f8df9b" stroke-width="2"/><path d="M35 67L50 83L65 67L59 60L41 60Z" fill="${skin}"/><path d="M24 39Q23 15 49 15Q77 15 76 42L70 61Q63 72 50 72Q35 71 29 59Z" fill="${skin}" stroke="#a96f67" stroke-width=".8"/><path d="${bangs}" fill="url(#hair-${Object.keys(CARDS).find(id=>CARDS[id]===d)})" stroke="${hair}" stroke-width="1.4"/><path d="M30 47Q38 42 44 47M57 47Q64 42 70 47" fill="none" stroke="#593d52" stroke-width="2.5" stroke-linecap="round"/><ellipse cx="38" cy="51" rx="5" ry="6" fill="#f7fbff"/><ellipse cx="63" cy="51" rx="5" ry="6" fill="#f7fbff"/><ellipse cx="39" cy="52" rx="2.8" ry="4" fill="${glow}"/><ellipse cx="62" cy="52" rx="2.8" ry="4" fill="${glow}"/><circle cx="40" cy="51" r="1.2" fill="#fff"/><circle cx="63" cy="51" r="1.2" fill="#fff"/><path d="M46 63Q50 66 55 62" fill="none" stroke="#a85f65" stroke-width="1.5" stroke-linecap="round"/><path d="M29 76L43 70L50 83L57 70L72 76L66 100H34Z" fill="${cloth}" stroke="#f5d98c" stroke-width="1.5"/><path d="M43 71L50 83L57 71" fill="none" stroke="#fff0b4" stroke-width="2"/><path d="M14 25L20 13L26 25L20 31Z" fill="#ffe9a4" opacity=".9"/><circle cx="82" cy="19" r="3" fill="#fff4c2"/><path d="M7 88L18 78L23 100H7ZM77 100L82 78L94 89V100Z" fill="${glow}" opacity=".75"/></svg>`;
+}
+const MON={
+  blob:'<path class="b" d="M10 80Q6 30 50 20Q94 30 90 80Q50 92 10 80Z"/><circle class="e" cx="38" cy="54" r="5"/><circle class="e" cx="62" cy="54" r="5"/>',
+  horn:'<circle class="b" cx="50" cy="58" r="30"/><path class="b" d="M26 38L18 12L40 30Z M74 38L82 12L60 30Z"/><circle class="e" cx="40" cy="56" r="5"/><circle class="e" cx="60" cy="56" r="5"/>',
+  wolf:'<path class="b" d="M14 30L30 14L40 34L60 34L70 14L86 30L84 62Q50 96 16 62Z"/><circle class="e" cx="36" cy="48" r="4.5"/><circle class="e" cx="64" cy="48" r="4.5"/>',
+  hood:'<path class="b" d="M50 8C70 8 80 30 76 50L90 92H10L24 50C20 30 30 8 50 8Z"/><circle class="e" cx="42" cy="40" r="4"/><circle class="e" cx="58" cy="40" r="4"/>',
+  bat:'<path class="b" d="M50 30L66 20L96 34L84 40L90 56L72 48L62 70L50 56L38 70L28 48L10 56L16 40L4 34L34 20Z"/><circle class="e" cx="44" cy="38" r="3.5"/><circle class="e" cx="56" cy="38" r="3.5"/>',
+  wisp:'<path class="b" d="M50 6C64 28 84 40 78 66C74 88 26 88 22 66C16 40 38 30 50 6Z"/><circle class="e" cx="42" cy="60" r="4.5"/><circle class="e" cx="58" cy="60" r="4.5"/>',
+  dragon:'<path class="b" d="M8 70L20 36L32 44L40 16L52 36L66 12L72 40L92 30L86 62Q60 94 22 84Z"/><circle class="e" cx="44" cy="50" r="5"/><circle class="e" cx="62" cy="48" r="5"/>'
+};
+function mon(e,extra=''){return `<svg class="mon el-${EL[e.el]} ${extra}" viewBox="0 0 100 100" aria-hidden="true">${MON[e.sh]}</svg>`;}
+function tile(c,o={}){
+  const d=CARDS[c.id],k=EL[d.el],tag=o.div?'div':'button',atk=c.u?cAtk(c):d.atk,hp=c.u?cHp(c):d.hp;
+  return `<${tag} class="card rar-${d.r} el-${k}" ${o.div?'':`type="button" data-a="card" data-v="${c.u}"`}>
+    <span class="art">${portrait(d)}<span class="elg">${d.el}</span><span class="rr">${d.r}</span><span class="lv">Lv${c.lv}</span>${o.badge?`<span class="badge">${o.badge}</span>`:''}</span>
+    <span class="nm">${d.n}</span><span class="sub">ATK ${atk}<br>HP ${hp}</span></${tag}>`;
+}
+function skDesc(s){
+  const m=Math.round((s.m||0)*100),p=Math.round((s.pct||0)*100);
+  if(s.type==='single')return `敵1体に攻撃力の${m}％のダメージ`;
+  if(s.type==='all')return `敵全体に攻撃力の${m}％のダメージ`;
+  if(s.type==='multi')return `ランダムな敵に${s.hits}回、各${m}％のダメージ`;
+  if(s.type==='heal')return `味方全体のHPを最大HPの${p}％回復`;
+  return `敵全体に${m}％のダメージ、味方全体のHPを${p}％回復`;
+}
+
+/* ---------- views ---------- */
+function render(){
+  $('#w-gold').textContent=S.gold.toLocaleString('ja-JP');
+  $('#w-shard').textContent=S.shards;
+  document.querySelectorAll('.nav-in button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.tab));
+  $('#view').innerHTML=S.tab==='deck'?viewDeck():S.tab==='gacha'?viewGacha():viewQuest();
+}
+function viewQuest(){
+  const mini=S.deck.map(u=>{const d=CARDS[inst(u).id];return `<i class="el-${EL[d.el]}">${d.n.slice(0,1)}</i>`;}).join('');
+  const rows=QUESTS.map((q,i)=>{
+    const done=!!S.cleared[q.id],locked=i>0&&!S.cleared[QUESTS[i-1].id];
+    const thumbs=q.waves.flat().map(id=>mon(EN[id])).join('');
+    return `<li class="q ${locked?'locked':''}">
+      <div class="qh"><span class="qn">${q.name}</span>${q.boss?'<span class="tag">ボス</span>':''}${done?'<span class="tag ok">クリア</span>':''}</div>
+      <p class="qd">${q.desc}</p>
+      <div class="qm" aria-label="出現する魔物">${thumbs}</div>
+      <div class="qf"><div class="rw-line"><span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#f2c35b"/></svg>${q.gold}</span><span><svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="12,2 14.9,8.6 22,9.3 16.6,14 18.2,21 12,17.3 5.8,21 7.4,14 2,9.3 9.1,8.6" fill="#9fc0ff"/></svg>${done?q.rep:q.first}</span></div>
+      <button class="btn pri" type="button" data-a="go" data-v="${q.id}" ${locked?'disabled':''}>${locked?'未開放':'出撃'}</button></div></li>`;
+  }).join('');
+  const all=QUESTS.every(q=>S.cleared[q.id]);
+  return `<section class="prologue"><h2>第1章　星降りの森</h2><p>夜空の王冠が砕け、星屑が大地に降りそそいだ。星屑を集め、仲間とともに王冠を取り戻す旅へ。</p></section>
+  <section><div class="deckbar"><div class="mini">${mini}</div><span class="cost ${deckCost()>costLimit()?'bad':''}">コスト ${deckCost()}/${costLimit()}</span><button class="btn" type="button" data-a="tab" data-v="deck">編成</button></div></section>
+  <section><h2>クエスト</h2><ul class="quests">${rows}</ul></section>
+  ${all?'<section class="prologue"><h2>第1章　完</h2><p>竜の手から王冠の欠片を取り戻した。旅はまだ、はじまったばかりだ。</p></section>':''}
+  <section><button class="link" type="button" data-a="reset">${resetArm?'もう一度押すとセーブデータを消去します':'セーブデータを初期化'}</button></section>`;
+}
+function viewDeck(){
+  const slots=[0,1,2,3].map(i=>S.deck[i]?tile(inst(S.deck[i])):'<div class="slot">空き</div>').join('');
+  const tAtk=S.deck.reduce((s,u)=>s+cAtk(inst(u)),0),tHp=S.deck.reduce((s,u)=>s+cHp(inst(u)),0);
+  const sorted=[...S.cards].sort((a,b)=>RANK[CARDS[b.id].r]-RANK[CARDS[a.id].r]||b.lv-a.lv||a.id.localeCompare(b.id)||a.u-b.u);
+  const chip=k=>`<span class="chip el-${EL[k]}">${k}</span>`;
+  return `<section><div class="sh"><h2>パーティ</h2><span class="cost ${deckCost()>costLimit()?'bad':''}">コスト ${deckCost()} / ${costLimit()}</span></div>
+    <div class="grid4">${slots}</div><p class="muted" style="margin-top:8px">総ATK ${tAtk}　総HP ${tHp}　クエストをクリアするとコスト上限が増える</p></section>
+  <section class="legend"><div class="chain">${chip('炎')}<span class="arrow">→</span>${chip('森')}<span class="arrow">→</span>${chip('水')}<span class="arrow">→</span>${chip('炎')}<span class="muted">　矢印の先に1.5倍</span></div>
+    <div class="chain">${chip('光')}<span class="arrow">⇄</span>${chip('闇')}<span class="muted">　おたがいに1.25倍</span></div></section>
+  <section><div class="sh"><h2>所持カード</h2><span class="muted">${S.cards.length}枚</span></div>
+    <div class="grid">${sorted.map(c=>tile(c,{badge:S.deck.includes(c.u)?'編成中':''})).join('')}</div></section>`;
+}
+function viewGacha(){
+  return `<section class="banner"><svg class="bigcrest" viewBox="0 0 100 100" aria-hidden="true"><polygon points="50,6 58,38 90,28 66,50 90,72 58,62 50,94 42,62 10,72 34,50 10,28 42,38" fill="currentColor"/></svg>
+    <h2>星降りの召喚</h2><p>星のかけらを使って、新しい仲間を呼び出そう。</p>
+    <p class="rates">排出率　N 60％　R 33％　SR 7％</p>
+    <div class="pulls"><button class="btn" type="button" data-a="pull" data-v="1" ${S.shards<10?'disabled':''}>1回<small>★10</small></button>
+    <button class="btn pri" type="button" data-a="pull" data-v="10" ${S.shards<100?'disabled':''}>10回<small>★100・R以上1体確定</small></button></div>
+    <p class="muted">所持　★${S.shards}　クエストをくり返すと星のかけらが集まる。</p></section>
+  <section><h2>ラインナップ</h2><div class="grid">${IDS.map(id=>tile({u:0,id,lv:1},{div:1})).join('')}</div></section>`;
+}
+
+/* ---------- modal ---------- */
+function showModal(html,dismiss){const m=$('#modal');m.innerHTML=`<div class="backdrop" ${dismiss?'data-a="close"':''}></div><div class="sheet" role="dialog" aria-modal="true">${html}</div>`;m.hidden=false;}
+function closeModal(){const m=$('#modal');m.hidden=true;m.innerHTML='';sellArm=0;}
+function openDetail(u){
+  const c=inst(u);if(!c){closeModal();return;}
+  const d=CARDS[c.id],k=EL[d.el],inDeck=S.deck.includes(u),max=MAXLV[d.r],cost=enhCost(c),val=sellVal(c),maxed=c.lv>=max;
+  showModal(`<div class="dt"><div class="dart card rar-${d.r} el-${k}"><span class="art">${portrait(d)}<span class="elg">${d.el}</span><span class="rr">${d.r}</span></span></div>
+    <div class="dinfo"><p class="ep">${d.t}</p><h2>${d.n}</h2><p class="muted">Lv ${c.lv} / ${max}　コスト ${d.cost}</p><p class="stats">ATK <b>${cAtk(c)}</b>　HP <b>${cHp(c)}</b></p></div></div>
+    <div class="skill"><b>スキル「${d.sk.n}」</b><span>${skDesc(d.sk)}（再使用まで${d.sk.cd}ターン）</span></div>
+    <div class="btns col">
+      <button class="btn pri" type="button" data-a="toggle" data-v="${u}">${inDeck?'編成から外す':'編成に入れる'}</button>
+      <button class="btn" type="button" data-a="enh" data-v="${u}" ${maxed||S.gold<cost?'disabled':''}>${maxed?'最大レベル':`強化　Lv${c.lv}→${c.lv+1}　${cost}G`}</button>
+      <button class="btn ghost" type="button" data-a="sell" data-v="${u}" ${inDeck?'disabled':''}>${inDeck?'編成中のカードは売却できません':sellArm===u?`本当に売却しますか？ もう一度押すと +${val}G`:`売却　+${val}G`}</button>
+      <button class="btn ghost" type="button" data-a="close">閉じる</button>
+    </div>`,true);
+}
+function toggleDeck(u){
+  const i=S.deck.indexOf(u);
+  if(i>=0){if(S.deck.length<=1){toast('編成は最低1体必要です');return;}S.deck.splice(i,1);}
+  else{
+    if(S.deck.length>=4){toast('編成は4体までです');return;}
+    if(deckCost()+CARDS[inst(u).id].cost>costLimit()){toast('コスト上限をこえます');return;}
+    S.deck.push(u);
+  }
+  save();render();openDetail(u);
+}
+function enhance(u){
+  const c=inst(u),d=CARDS[c.id];if(c.lv>=MAXLV[d.r])return;
+  const cost=enhCost(c);if(S.gold<cost){toast('ゴールドが足りません');return;}
+  S.gold-=cost;c.lv++;save();render();openDetail(u);
+}
+function sellCard(u){
+  if(S.deck.includes(u))return;
+  if(sellArm!==u){sellArm=u;openDetail(u);return;}
+  const c=inst(u),v=sellVal(c);S.gold+=v;S.cards=S.cards.filter(x=>x.u!==u);sellArm=0;save();render();closeModal();toast(`売却した　+${v}G`);
+}
+function pull(n){
+  const cost=n===1?10:100;if(S.shards<cost){toast('星のかけらが足りません');return;}
+  S.shards-=cost;
+  const got=[],seen=new Set(S.cards.map(c=>c.id));
+  for(let i=0;i<n;i++){
+    const x=Math.random()*100;let r=x<7?'SR':x<40?'R':'N';
+    if(n===10&&i===9&&!got.some(g=>g.r!=='N')&&r==='N')r='R';
+    const id=pick(IDS.filter(k=>CARDS[k].r===r)),isNew=!seen.has(id);seen.add(id);
+    got.push({c:addCard(id),r,isNew});
+  }
+  save();render();
+  showModal(`<h2 class="res win">召喚結果</h2><div class="grid res-grid">${got.map((g,i)=>`<div class="pop" style="--i:${i}">${tile(g.c,{div:1,badge:g.isNew?'NEW':''})}</div>`).join('')}</div>
+    <div class="btns"><button class="btn pri" type="button" data-a="close">とじる</button>${S.shards>=10?'<button class="btn" type="button" data-a="pull" data-v="1">もう1回　★10</button>':''}</div>`,true);
+}
+
+/* ---------- battle ---------- */
+const alive=a=>a.filter(x=>x.hp>0);
+function elemMul(a,d){if(ADV[a]===d)return 1.5;if(ADV[d]===a)return .75;if((a==='光'&&d==='闇')||(a==='闇'&&d==='光'))return 1.25;return 1;}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms/(B?B.speed:1)));
+function spawn(q,w){return q.waves[w].map(id=>Object.assign({id},EN[id],{max:EN[id].hp}));}
+function head(){
+  if(!B)return;
+  $('#b-quest').textContent=B.q.name;
+  $('#b-wave').textContent=`WAVE ${B.wave+1}/${B.q.waves.length}　ターン ${B.round}`;
+  const a=$('#b-auto');a.textContent='オート '+(B.auto?'ON':'OFF');a.classList.toggle('on',B.auto);
+  $('#b-speed').textContent='×'+B.speed;
+}
+function setLog(t){$('#b-log').textContent=t;}
+function renderBattle(){
+  if(!B)return;
+  $('#b-enemies').innerHTML=B.enemies.map((e,i)=>`<div class="en ${e.hp<=0?'dead':''} ${e.boss?'boss':''}" data-e="${i}">${mon(e)}<div class="bar"><i style="width:${Math.round(e.hp/e.max*100)}%"></i></div><div class="enm">${e.n}</div></div>`).join('');
+  $('#b-party').innerHTML=B.party.map((p,i)=>{
+    const dead=p.hp<=0,ready=!dead&&p.cd<=0,pend=B.pending.has(i);
+    return `<div class="pm el-${EL[p.el]} ${dead?'dead':''}" data-p="${i}"><div class="pa">${portrait(CARDS[p.id])}</div><div class="pn">${p.name}</div>
+      <div class="bar"><i style="width:${Math.round(p.hp/p.max*100)}%"></i></div><div class="pv">${p.hp}/${p.max}</div>
+      <button class="sk ${ready?'ready':''} ${pend?'pend':''}" type="button" data-a="skill" data-v="${i}" ${ready?'':'disabled'}>${dead?'—':ready?(pend?'発動待ち':'スキル'):'あと'+p.cd}</button></div>`;
+  }).join('');
+  head();
+}
+function fx(el,text,cls){
+  const lay=$('#fx'),lr=$('#battle').getBoundingClientRect(),r=el.getBoundingClientRect();
+  const s=document.createElement('span');s.className='dmg '+cls;s.textContent=text;
+  s.style.left=(r.left+r.width/2-lr.left)+'px';s.style.top=(r.top+r.height*0.2-lr.top)+'px';
+  lay.appendChild(s);setTimeout(()=>s.remove(),950);
+}
+function act(kind,i){const el=document.querySelector(kind==='p'?`[data-p="${i}"]`:`[data-e="${i}"]`);if(el)el.classList.add('act');}
+function dmgEnemy(b,e,p,m){
+  const em=elemMul(p.el,e.el),d=Math.max(1,Math.round(p.atk*m*em*(0.9+Math.random()*0.2)));
+  e.hp=Math.max(0,e.hp-d);renderBattle();
+  const el=document.querySelector(`[data-e="${b.enemies.indexOf(e)}"]`);
+  if(el){el.classList.add('hit');fx(el,em>1?d+'!':d,em>1?'weak':em<1?'resist':'');}
+}
+function dmgParty(b,p,e,m){
+  const em=elemMul(e.el,p.el),d=Math.max(1,Math.round(e.atk*m*em*(0.9+Math.random()*0.2)));
+  p.hp=Math.max(0,p.hp-d);renderBattle();
+  const el=document.querySelector(`[data-p="${b.party.indexOf(p)}"]`);
+  if(el){el.classList.add('hit');fx(el,d,'ally');}
+}
+function healAll(b,pct){
+  const amts=b.party.map(p=>{if(p.hp<=0)return 0;const a=Math.min(p.max-p.hp,Math.round(p.max*pct));p.hp+=a;return a;});
+  renderBattle();
+  amts.forEach((a,i)=>{if(a>0){const el=document.querySelector(`[data-p="${i}"]`);if(el)fx(el,'+'+a,'heal');}});
+}
+async function attack(b,i){
+  const p=b.party[i],t=alive(b.enemies)[0];if(!t)return;
+  act('p',i);await sleep(200);dmgEnemy(b,t,p,1);await sleep(420);
+}
+async function useSkill(b,i){
+  const p=b.party[i],s=p.sk;
+  setLog(`${p.name}「${s.n}」`);act('p',i);await sleep(450);
+  const en=alive(b.enemies);
+  if(s.type==='single'){if(en[0])dmgEnemy(b,en[0],p,s.m);await sleep(380);}
+  else if(s.type==='all'||s.type==='allheal'){en.forEach(t=>dmgEnemy(b,t,p,s.m));if(s.type==='allheal')healAll(b,s.pct);await sleep(520);}
+  else if(s.type==='multi'){
+    for(let k=0;k<s.hits;k++){const a=alive(b.enemies);if(!a.length)break;dmgEnemy(b,pick(a),p,s.m);await sleep(230);}
+    await sleep(200);
+  }
+  else if(s.type==='heal'){healAll(b,s.pct);await sleep(520);}
+}
+async function enemyAct(b,j){
+  const e=b.enemies[j];act('e',j);
+  if(e.aoe&&b.round%e.aoe===0){
+    setLog(`${e.n}の全体攻撃!`);await sleep(450);
+    alive(b.party).forEach(p=>dmgParty(b,p,e,.55));await sleep(450);
+  }else{
+    const t=pick(alive(b.party));await sleep(240);dmgParty(b,t,e,1);await sleep(380);
+  }
+}
+async function runBattle(b){
+  await sleep(700);
+  while(!b.over){
+    b.round++;
+    if(b.auto)b.party.forEach((p,i)=>{if(p.hp>0&&p.cd<=0)b.pending.add(i);});
+    setLog(b.auto?'':'光っているスキルをタップ');renderBattle();
+    for(let i=0;i<b.party.length&&!b.over;i++){
+      const p=b.party[i];if(p.hp<=0)continue;
+      if(!alive(b.enemies).length)break;
+      if(b.pending.has(i)&&p.cd<=0){b.pending.delete(i);p.cd=p.cdMax;await useSkill(b,i);}
+      else{await attack(b,i);if(p.cd>0)p.cd--;}
+      renderBattle();
+    }
+    if(b.over)return;
+    if(!alive(b.enemies).length){
+      if(b.wave+1>=b.q.waves.length){await finish(b,true);return;}
+      b.wave++;b.enemies=spawn(b.q,b.wave);b.pending.clear();renderBattle();setLog(`WAVE ${b.wave+1}`);await sleep(900);continue;
+    }
+    for(let j=0;j<b.enemies.length&&!b.over;j++){
+      if(b.enemies[j].hp<=0)continue;
+      await enemyAct(b,j);
+      if(!alive(b.party).length)break;
+    }
+    if(b.over)return;
+    if(!alive(b.party).length){await finish(b,false);return;}
+    renderBattle();
+  }
+}
+async function finish(b,win){
+  b.over=true;await sleep(600);
+  if(win){
+    const q=b.q,first=!S.cleared[q.id],shards=first?q.first:q.rep;
+    S.gold+=q.gold;S.shards+=shards;S.cleared[q.id]=1;
+    let drop=null;if(Math.random()<q.drop.p)drop=addCard(pick(q.drop.ids));
+    save();render();
+    const last=QUESTS.every(x=>S.cleared[x.id])&&first&&q.id===QUESTS[QUESTS.length-1].id;
+    showModal(`<h2 class="res win">クエスト クリア!</h2>
+      <ul class="rwlist"><li><span>ゴールド</span><span>+${q.gold}</span></li><li><span>星のかけら${first?'（初回）':''}</span><span>+${shards}</span></li>${first?`<li><span>コスト上限</span><span>${costLimit()}</span></li>`:''}</ul>
+      ${drop?`<div class="dropbox">${tile(drop,{div:1,badge:'NEW'})}<p><b>カードを手に入れた!</b><br><span class="muted">編成タブで強化・編成できる。</span></p></div>`:''}
+      ${last?'<p class="muted">第1章をクリアした。星屑の王冠の旅は、ここから続いていく。</p>':''}
+      <div class="btns"><button class="btn" type="button" data-a="leave">拠点に戻る</button><button class="btn pri" type="button" data-a="retry">もう一度</button></div>`,false);
+  }else{
+    showModal(`<h2 class="res lose">ぜんめつ…</h2>
+      <p class="muted">カードを強化するか、編成を見直そう。炎→森→水→炎の相性で、与えるダメージが大きく変わる。</p>
+      <div class="btns col"><button class="btn pri" type="button" data-a="retry">再挑戦</button><button class="btn" type="button" data-a="toDeck">編成を見直す</button><button class="btn ghost" type="button" data-a="leave">拠点に戻る</button></div>`,false);
+  }
+}
+function startQuest(id){
+  const qi=QUESTS.findIndex(q=>q.id===id);if(qi<0)return;const q=QUESTS[qi];
+  if(qi>0&&!S.cleared[QUESTS[qi-1].id]){toast('前のクエストをクリアしてください');return;}
+  if(!S.deck.length){toast('編成が空です');return;}
+  if(deckCost()>costLimit()){toast('コスト上限をこえています');return;}
+  closeModal();lastQuest=id;
+  const party=S.deck.map(u=>{const c=inst(u),d=CARDS[c.id];return {u,id:c.id,name:d.n,el:d.el,pts:d.pts,atk:cAtk(c),max:cHp(c),hp:cHp(c),sk:d.sk,cdMax:d.sk.cd,cd:Math.max(1,d.sk.cd-2)};});
+  B={q,party,wave:0,round:0,enemies:spawn(q,0),auto:false,speed:1,pending:new Set(),over:false};
+  $('#battle').hidden=false;$('#fx').innerHTML='';
+  renderBattle();setLog(`WAVE 1`);
+  runBattle(B);
+}
+function leaveBattle(){if(B)B.over=true;B=null;$('#battle').hidden=true;closeModal();render();}
+
+/* ---------- events ---------- */
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-a]');if(!t)return;
+  const a=t.dataset.a,v=t.dataset.v;
+  switch(a){
+    case 'tab':S.tab=v;save();closeModal();render();window.scrollTo(0,0);break;
+    case 'go':startQuest(v);break;
+    case 'card':sellArm=0;openDetail(+v);break;
+    case 'close':closeModal();break;
+    case 'toggle':sellArm=0;toggleDeck(+v);break;
+    case 'enh':sellArm=0;enhance(+v);break;
+    case 'sell':sellCard(+v);break;
+    case 'pull':pull(+v);break;
+    case 'skill':{if(!B||B.over)break;const i=+v,p=B.party[i];if(p&&p.hp>0&&p.cd<=0){B.pending.add(i);renderBattle();}break;}
+    case 'auto':if(B){B.auto=!B.auto;head();}break;
+    case 'speed':if(B){B.speed=B.speed%3+1;head();}break;
+    case 'retreat':leaveBattle();break;
+    case 'leave':leaveBattle();break;
+    case 'retry':{const id=lastQuest;leaveBattle();startQuest(id);break;}
+    case 'toDeck':leaveBattle();S.tab='deck';save();render();break;
+    case 'reset':
+      if(!resetArm){resetArm=true;render();setTimeout(()=>{resetArm=false;if(S.tab==='quest'&&!B)render();},3000);}
+      else{resetArm=false;S=fresh();save();render();toast('セーブデータを初期化した');}
+      break;
+  }
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#modal').hidden&&$('#modal .backdrop[data-a="close"]'))closeModal();});
+
+render();
+})();
+</script>
+
+
+<script>
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+}
+</script>
+
+</body></html>
